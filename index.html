@@ -86,8 +86,20 @@
       <button>Trigger a Global Error</button>
     </section>
   </main>
-
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "e8adb95628e949c9991df6fe0b4e40ac"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>            
+  <script>
+    class cError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "CustomError";
+      }
+    }
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,14 +107,85 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        if (!firstNum || !secondNum) {
+          throw new Error('Missing Numbers');
+        }
+        if (isNaN(firstNum) || isNaN(secondNum)) {
+          throw new Error('Input must be a number');
+        }
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch (error) {
+        if (error instanceof cError) {
+          output.innerHTML = `Custom Error: ${error.message}`;
+          console.error('Custom Error:', error);
+        } else {
+          output.innerHTML = 'An error occurred';
+          console.error('Error:', error);
+        }
+      } finally {
+        console.log('Calculation initiated');
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+    errorBtns[0].addEventListener('click', () => {
+      console.log('Console Log Demo');
+    });
+    errorBtns[1].addEventListener('click', () => {
+      console.error('Console Error Demo');
+    });
+    errorBtns[2].addEventListener('click', () => {
+      console.count('Console Count Demo');
+    });
+    errorBtns[3].addEventListener('click', () => {
+      console.warn('Console Warn Demo');
+    });
+    errorBtns[4].addEventListener('click', () => {
+      console.assert(false, 'Console Assert Demo');
+    });
+    errorBtns[5].addEventListener('click', () => {
+      console.clear();
+    });
+    errorBtns[6].addEventListener('click', () => {
+      console.dir(document.body);
+    });
+    errorBtns[7].addEventListener('click', () => {
+      console.dirxml(document);
+    });
+    errorBtns[8].addEventListener('click', () => {
+      console.group('Console Group Demo');
+      console.log('Inside Group');
+    });
+    errorBtns[9].addEventListener('click', () => {
+      console.groupEnd();
+    });
+    errorBtns[10].addEventListener('click', () => {
+      console.table([{ firstName: 'John', lastName: 'Doe' }, { firstName: 'Jane', lastName: 'Doe' }]);
+    });
+    errorBtns[11].addEventListener('click', () => {
+      console.time('Console Timer');
+    });
+    errorBtns[12].addEventListener('click', () => {
+      console.timeEnd('Console Timer');
+    });
+    errorBtns[13].addEventListener('click', () => {
+      console.trace('Console Trace Demo');
+    });
+    errorBtns[14].addEventListener('click', () => {
+      try {
+        throw new cError('Custom Error');
+      } catch (error) {
+        console.error('Custom Error:', error);
+      } finally {
+        console.log('Custom error completed');
+      }
+    });
   </script>
+  
 </body>
 
 </html>
